@@ -57,6 +57,42 @@ try {
 		echo "<pre>";
 		var_dump($taxi_car);
 		echo "</pre>";
+
+		$list = "PHP Frameworks List";
+		$redis->rpush($list, "Symfony 2");
+		$redis->rpush($list, "Symfony 1.4");
+		$redis->lpush($list, "Zend Framework");
+
+		echo "Number of frameworks in list: " . $redis->llen($list) . "<br>";
+
+		$arList = $redis->lrange($list, 0, -1);
+		echo "<pre>";
+		print_r($arList);
+		echo "</pre>";
+
+		// the last entry in the list
+		echo $redis->rpop($list) . "<br>";
+
+		// the first entry in the list
+		echo $redis->lpop($list) . "<br>";
+
+
+		// set the expiration for next week
+		$redis->set("expire in 1 week", "I have data for a week");
+		$val = $redis->get("expire in 1 week");
+		echo $val;
+		$redis->expireat("expire in 1 week", strtotime("+1 week"));
+		$val2 = $redis->get("expire in 1 week");
+		echo $val2;
+		$ttl = $redis->ttl("expire in 1 week"); // will be 604800 seconds
+		$val3 = $redis->get("expire in 1 week");
+		echo $val3;
+		echo $ttl;
+
+		// never expires
+		$redis->set("never expire", "I want to leave forever!");
+		$val4 = $redis->get("never expire");
+		echo $val4;
 }
 catch (Exception $e) {
     echo "Couldn't connected to Redis";
